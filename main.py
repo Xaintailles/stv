@@ -33,6 +33,9 @@ def run_instant_runoff(results_path: str,
         choice_counter = 1
 
         for column in electoral_stats:
+            if choice_counter != 1:
+                continue
+
             all_index = electoral_stats[column].value_counts().index.to_list()
             all_votes = electoral_stats[column].value_counts().to_list()
             
