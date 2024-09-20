@@ -4,10 +4,14 @@ import dict_helpers as dh
 import copy
 import csv
 
-def run_instant_runoff(print_turns: bool, print_audit: bool):
+def run_instant_runoff(results_path: str, 
+                       print_turns: bool, 
+                       print_audit: bool,
+                       print_choice_stats: bool 
+                    ):
     vote_dict = {}
 
-    with open(r'./data/votes.csv', newline='') as csvfile:
+    with open(results_path, newline='') as csvfile:
         votes = csv.reader(csvfile, delimiter=',', quotechar='|')
         for row in votes:
             if len(row) == 0:
@@ -18,9 +22,34 @@ def run_instant_runoff(print_turns: bool, print_audit: bool):
 
     all_rounds_audit = {}
 
+    total_ballots = len(vote_dict)
+
     #calculate first position voting
     #eliminate last candidate
     #re-shuffle dicts, moving everyone 1 up
+
+    if print_choice_stats:
+        electoral_stats = pd.DataFrame.from_dict(vote_dict, orient='index')
+        choice_counter = 1
+
+        for column in electoral_stats:
+            all_index = electoral_stats[column].value_counts().index.to_list()
+            all_votes = electoral_stats[column].value_counts().to_list()
+            
+            all_votes_perc = list(map(lambda x: round(x / total_ballots * 100,2), all_votes))
+
+            print(f"Choice #{choice_counter} perc:")
+
+            for i in range(len(all_index)):
+                
+                print(f"{all_index[i]}: {all_votes_perc[i]}%")
+
+            
+            choice_counter += 1
+
+
+    if print_turns:
+        print(f"We have a total of {total_ballots} expressed ballots")
 
     while dh.find_max_length_sublist(vote_dict) > 1:
 
@@ -54,6 +83,11 @@ def run_instant_runoff(print_turns: bool, print_audit: bool):
 
     if print_audit:
         print("### This is the audit for every round ###")
-        print(all_rounds_audit)
+        for current_round in all_rounds_audit.items():
+            print(current_round)
 
-run_instant_runoff(print_turns = True, print_audit = False)
+run_instant_runoff(results_path = r'./data/votes.csv',
+                   print_turns = True, 
+                   print_audit = False,
+                   print_choice_stats = True
+                )
