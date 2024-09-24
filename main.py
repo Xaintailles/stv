@@ -59,6 +59,8 @@ def run_instant_runoff(results_path: str,
         all_rounds_audit[turn_counter] = copy.deepcopy(vote_dict)
 
         if print_turns:
+            print("")
+            print("")
             print(f"### Starting turn: {turn_counter} ###")
 
         df_votes = pd.DataFrame.from_dict(vote_dict, orient='index')
